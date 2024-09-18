@@ -20,19 +20,83 @@ def index():
 
 @app.route('/bakeries')
 def bakeries():
-    return ''
+    bakeries = []
+    for bakery in Bakery.query.all():
+        bakery_dict = {
+             "id": bakery.id,
+            "name": bakery.name,
+            "created_at": bakery.created_at,
+            "updated_at": bakery.updated_at,
+           
+        }
+        bakeries.append(bakery_dict)
+
+        response = make_response(
+        jsonify(bakeries),
+        200,
+       
+    )
+    return response
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
-    return ''
+    bakery = Bakery.query.filter(Bakery.id == id).first()
+    bakery_dict = {
+        "id": bakery.id,
+        "name": bakery.name,
+        "created_at": bakery.created_at,
+        "updated_at": bakery.updated_at,
+           
+    }
+ 
+    response = make_response(
+        jsonify(bakery_dict),
+        200,
+    )
+    response.headers["Content-Type"] = "application/json"
+    return response
+
 
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
-    return ''
+    # Query baked goods and order by price in descending order
+    baked_goods = BakedGood.query.order_by(BakedGood.price.desc()).all()
 
+    # Convert to list of dictionaries
+    baked_goods_list = []
+    for baked_good in baked_goods:
+        baked_good_dict = {
+            "id": baked_good.id,
+            "name": baked_good.name,
+            "price": baked_good.price,
+            "created_at": baked_good.created_at,
+            "updated_at": baked_good.updated_at,
+            "bakery_id": baked_good.bakery_id
+        }
+        baked_goods_list.append(baked_good_dict)
+
+    # Create a response with JSON content
+    response = make_response(jsonify(baked_goods_list), 200)
+    return response
+
+#most expensive query
 @app.route('/baked_goods/most_expensive')
 def most_expensive_baked_good():
-    return ''
+    most_expensive = BakedGood.query.order_by(BakedGood.price.desc()).first()
+
+    baked_good_dict = {
+        "id": most_expensive.id,
+        "name": most_expensive.name,
+        "price": most_expensive.price,
+        "created_at": most_expensive.created_at,
+        "updated_at": most_expensive.updated_at,
+        "bakery_id": most_expensive.bakery_id
+    }
+
+    response = make_response(jsonify(baked_good_dict), 200)
+   
+    return response
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
